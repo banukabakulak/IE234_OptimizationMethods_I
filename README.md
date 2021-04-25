@@ -1,1 +1,1 @@
-# IE234_OptmizationMethodsI
+# IE234_OptimizationMethods_I
