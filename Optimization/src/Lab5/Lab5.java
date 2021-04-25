@@ -16,24 +16,28 @@ public class Lab5 {
 	final static int nConstraints = 14;
 
 	public static void main(String[] args) {
-	
+		// TODO Auto-generated method stub
+		
+		System.out.println("Hello world!");
+		
 		try {
 			
 			IloCplex scheduleModel = new IloCplex();
 			
-			// define decision variables 
+			// define the decision variables 
 			
 			IloNumVar[] F = new IloNumVar[full_time];
 			
 			for(int i = 0; i < full_time; i++)
-				F[i] = scheduleModel.numVar(0, Double.MAX_VALUE, "F(" + i + ")");
+				F[i] = scheduleModel.numVar(0, Double.MAX_VALUE, "F(" + i + ")"); // F(i)
 			
 			IloNumVar[] P = new IloNumVar[part_time];
 			
 			for(int i = 0; i < part_time; i++)
-				P[i] = scheduleModel.numVar(0, Double.MAX_VALUE, "P(" + i + ")");
+				P[i] = scheduleModel.numVar(0, Double.MAX_VALUE, "P(" + i + ")"); // P(i)
 			
-			// define objective function
+			
+			// define the objective function
 			
 			IloLinearNumExpr objective = scheduleModel.linearNumExpr();
 			
@@ -45,12 +49,11 @@ public class Lab5 {
 			
 			scheduleModel.addMinimize(objective);
 			
-			// define A_matrix and rightHandSide
+			// define the A_matrix and rightHandSide 
 			
 			double[][] A_matrix = new double[nConstraints][nVariables];
 			
-			double[] rightHandSide = new double[nConstraints];
-			
+			int[] rightHandSide = new int[nConstraints];
 			
 			try {
 				
@@ -65,21 +68,19 @@ public class Lab5 {
 					for(int i = 0; i < nVariables; i++)
 						A_matrix[j][i] = Double.parseDouble(scan[i]);
 					
-					rightHandSide[j] = Double.parseDouble(scan[nVariables]);			
+					rightHandSide[j] = Integer.parseInt(scan[nVariables], 10);				
 				}
 				
-				
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
+			}catch(FileNotFoundException e)
+			{
 				e.printStackTrace();
 			}
 			
+			// define the constraints 
 			
-			// define constraints 
 			for(int j = 0; j < nConstraints; j++)
 			{
 				IloLinearNumExpr constraint = scheduleModel.linearNumExpr();
-				
 				
 				for(int i = 0; i < full_time; i++)
 					constraint.addTerm(A_matrix[j][i], F[i]);
@@ -87,38 +88,37 @@ public class Lab5 {
 				for(int i = 0; i < part_time; i++)
 					constraint.addTerm(A_matrix[j][i + full_time], P[i]);
 				
-				scheduleModel.addGe(constraint, rightHandSide[j]);				
+				scheduleModel.addGe(constraint, rightHandSide[j]);
 			}
 			
 			scheduleModel.exportModel("scheduleModel.lp");
 			
-			// solve Model
+			// solve the model
 			
 			Boolean success = scheduleModel.solve();
 			
-			if(success) 
+			if(success)
 			{
+				System.out.println("The problem status is " + scheduleModel.getStatus());
+				
 				System.out.println("The objective value is " + scheduleModel.getObjValue());
 				
-				System.out.println("The personel numbers are");
+				System.out.println("The personnel numbers are ");
 				
 				for(int i = 0; i < full_time; i++)
-					System.out.print(scheduleModel.getValue(F[i]) + " ");			
+					System.out.print(scheduleModel.getValue(F[i]) + " ");
 				
 				for(int i = 0; i < part_time; i++)
 					System.out.print(scheduleModel.getValue(P[i]) + " ");
-				
 			}
 			else 
 				System.out.println("The problem status is " + scheduleModel.getStatus());
 			
-			System.out.println();
 			
-		} catch (IloException e) {
-			// TODO Auto-generated catch block
+		}catch(IloException e)
+		{
 			e.printStackTrace();
 		}
-		
 
 	}
 
